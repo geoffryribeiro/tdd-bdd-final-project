@@ -132,8 +132,6 @@ def step_impl(context, element_name, text_string):
     )
     element.clear()
     element.send_keys(text_string)
-<<<<<<< HEAD
-=======
 
 @when('I press the "{button}" button')
 def step_impl(context, button):
@@ -164,4 +162,3 @@ def step_impl(context, message):
         )
     )
     assert(found)        
->>>>>>> dee6d0c (Initial commit)
