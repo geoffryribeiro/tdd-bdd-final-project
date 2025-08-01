@@ -33,6 +33,10 @@ from service.common import status
 from service.models import db, init_db, Product
 from tests.factories import ProductFactory
 from urllib.parse import quote_plus
+from service.models import Product, Category
+from decimal import Decimal
+
+
 
 
 # Disable all but critical errors during normal test run
@@ -77,6 +81,46 @@ class TestProductRoutes(TestCase):
     def tearDown(self):
         db.session.remove()
 
+    def test_update_product(client):
+        """Testa a atualização completa de um produto usando Enum Category"""
+
+        # Cria o produto original
+        product = Product(
+            name="Martelo comum",
+            description="Ferramenta básica",
+            price=Decimal("39.90"),
+            available=True,
+            category=Category.TOOLS
+        )
+        product.create()
+
+        # Dados de atualização (usando Category como string porque é assim que o endpoint espera via JSON)
+        updated_data = {
+            "name": "Martelo reforçado",
+            "description": "Ferramenta pesada",
+            "price": "59.90",  # como string porque o endpoint deserializa usando Decimal
+            "available": False,
+            "category": "TOOLS"  # será convertido para enum no método deserialize()
+        }
+
+        # Envia PUT
+        resp = client.put(f"/products/{product.id}", json=updated_data)
+        assert resp.status_code == 200
+
+        # Verifica resposta
+        response_json = resp.get_json()
+        assert response_json["name"] == "Martelo reforçado"
+        assert response_json["description"] == "Ferramenta pesada"
+        assert response_json["price"] == "59.90"  # Deve vir como string
+        assert response_json["available"] is False
+        assert response_json["category"] == "TOOLS"
+
+
+
+
+
+
+
     ############################################################
     # Utility function to bulk create products
     ############################################################
@@ -93,6 +137,7 @@ class TestProductRoutes(TestCase):
             test_product.id = new_product["id"]
             products.append(test_product)
         return products
+
 
     ############################################################
     #  T E S T   C A S E S
@@ -164,6 +209,7 @@ class TestProductRoutes(TestCase):
         """It should not Create a Product with wrong Content-Type"""
         response = self.client.post(BASE_URL, data={}, content_type="plain/text")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    
 
     #
     # ADD YOUR TEST CASES HERE

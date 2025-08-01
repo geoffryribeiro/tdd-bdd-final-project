@@ -203,3 +203,4 @@ def test_update_without_id_raises_error():
         assert False, "DataValidationError was not raised"
     except DataValidationError as error:
         assert str(error) == "Update called with empty ID field"
+
