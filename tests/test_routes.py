@@ -114,13 +114,6 @@ class TestProductRoutes(TestCase):
         assert response_json["price"] == "59.90"  # Deve vir como string
         assert response_json["available"] is False
         assert response_json["category"] == "TOOLS"
-
-
-
-
-
-
-
     ############################################################
     # Utility function to bulk create products
     ############################################################
@@ -154,7 +147,6 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data['message'], 'OK')
-
     # ----------------------------------------------------------
     # TEST CREATE
     # ----------------------------------------------------------
@@ -210,11 +202,9 @@ class TestProductRoutes(TestCase):
         response = self.client.post(BASE_URL, data={}, content_type="plain/text")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
     
-
     #
     # ADD YOUR TEST CASES HERE
     #
-
     ######################################################################
     # Utility functions
     ######################################################################
@@ -327,3 +317,35 @@ class TestProductRoutes(TestCase):
         # check the data just to be sure
         for product in data:
             self.assertEqual(product["available"], True)        
+    def test_create_product_sets_location_header(self):
+        """It should return Location header after product creation"""
+        product_data = {
+            "name": "ProdutoX",
+            "description": "Teste",
+            "price": "99.99",
+            "available": True,
+            "category": "FOOD"
+        }
+        response = self.client.post("/products", json=product_data)
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("Location", response.headers)
+    def test_list_products_with_invalid_category(self):
+        """It should return 400 BAD REQUEST for invalid category"""
+        response = self.client.get("/products?category=invalid")
+        self.assertEqual(response.status_code, 400)
+    def test_create_product_location_header(self):
+        """It should return Location header in response"""
+        product_data = {
+            "name": "Xícara Mágica",
+            "description": "Muda de cor com líquido quente",
+            "price": "29.90",
+            "available": True,
+            "category": "HOUSEWARES"
+        }
+
+        response = self.client.post("/products", json=product_data)
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("Location", response.headers)
+        self.assertTrue(response.headers["Location"].startswith("http"))
+        
+    
