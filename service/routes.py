@@ -23,6 +23,8 @@ from flask import url_for  # noqa: F401 pylint: disable=unused-import
 from service.models import Product
 from service.common import status  # HTTP Status Codes
 from . import app
+from service.models import db
+
 
 
 ######################################################################
@@ -92,52 +94,36 @@ def create_products():
     # location_url = url_for("get_products", product_id=product.id, _external=True)
     location_url = "/"  # delete once READ is implemented
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-
-
 ######################################################################
 # L I S T   A L L   P R O D U C T S
 ######################################################################
-<<<<<<< HEAD
-
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
-
-######################################################################
-# R E A D   A   P R O D U C T
-######################################################################
-
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT
-#
-
-######################################################################
-# U P D A T E   A   P R O D U C T
-######################################################################
-
-#
-# PLACE YOUR CODE TO UPDATE A PRODUCT HERE
-#
-
-######################################################################
-# D E L E T E   A   P R O D U C T
-######################################################################
-
-
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
-=======
 @app.route("/products", methods=["GET"])
 def list_products():
-    """Returns a list of Products"""
+    """Returns a list of Products, optionally filtered by name, category, and availability"""
     app.logger.info("Request to list Products...")
 
-    products = Product.all()
+    name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
 
+    query = Product.query
+
+    if name:
+        query = query.filter(Product.name.ilike(f"%{name}%"))
+
+    if category:
+        query = query.filter(Product.category.cast(db.String).ilike(f"%{category}%"))
+
+    if available is not None:
+        # Converte "true" / "false" para booleano
+        is_available = available.lower() == "true"
+        query = query.filter(Product.available == is_available)
+
+    products = query.all()
     results = [product.serialize() for product in products]
     app.logger.info("[%s] Products returned", len(results))
     return results, status.HTTP_200_OK
+
 
 ######################################################################
 # READ A PRODUCT
@@ -204,7 +190,7 @@ def delete_products(product_id):
 # LIST PRODUCTS
 ######################################################################
 @app.route("/products", methods=["GET"])
-def list_products():
+def list_returned_products():
     """Returns a list of Products"""
     app.logger.info("Request to list Products...")
 
@@ -218,7 +204,7 @@ def list_products():
 # LIST PRODUCTS
 ######################################################################
 @app.route("/products", methods=["GET"])
-def list_products():
+def list_all_products():
     """Returns a list of Products"""
     app.logger.info("Request to list Products...")
 
@@ -240,7 +226,7 @@ def list_products():
 # LIST PRODUCTS
 ######################################################################
 @app.route("/products", methods=["GET"])
-def list_products():
+def list_name_products():
     """Returns a list of Products"""
     app.logger.info("Request to list Products...")
 
@@ -267,7 +253,7 @@ def list_products():
 # LIST PRODUCTS
 ######################################################################
 @app.route("/products", methods=["GET"])
-def list_products():
+def list_category_products():
     """Returns a list of Products"""
     app.logger.info("Request to list Products...")
 
@@ -295,4 +281,4 @@ def list_products():
 
     results = [product.serialize() for product in products]
     app.logger.info("[%s] Products returned", len(results))
->>>>>>> dee6d0c (Initial commit)
+

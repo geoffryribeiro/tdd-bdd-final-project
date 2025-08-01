@@ -32,6 +32,8 @@ from service import app
 from service.common import status
 from service.models import db, init_db, Product
 from tests.factories import ProductFactory
+from urllib.parse import quote_plus
+
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -178,8 +180,6 @@ class TestProductRoutes(TestCase):
         data = response.get_json()
         # logging.debug("data = %s", data)
         return len(data)
-<<<<<<< HEAD
-=======
 
     def test_get_product(self):
         """It should Get a single Product"""
@@ -281,4 +281,3 @@ class TestProductRoutes(TestCase):
         # check the data just to be sure
         for product in data:
             self.assertEqual(product["available"], True)        
->>>>>>> dee6d0c (Initial commit)

@@ -38,8 +38,6 @@ Scenario: Create a Product
     And I should see "True" in the "Available" dropdown
     And I should see "Tools" in the "Category" dropdown
     And I should see "34.95" in the "Price" field
-<<<<<<< HEAD
-=======
 
 Scenario: Read a Product
     When I visit the "Home Page"
@@ -133,4 +131,12 @@ Scenario: Search by name
     Then I should see the message "Success"
     And I should see "Hat" in the "Name" field
     And I should see "A red fedora" in the "Description" field
->>>>>>> dee6d0c (Initial commit)
+
+Scenario: Products filtered by name
+  Given the following products
+    | name     | category | available | price |
+    | Lampada  | Casa     | True      | 15.99 |
+    | Caneca   | Cozinha  | True      | 9.99  |
+  When I search for products with name "Lampada"
+  Then I should see 1 product
+  And the product's name should be "Lampada"

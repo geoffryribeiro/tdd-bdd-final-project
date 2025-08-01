@@ -31,6 +31,8 @@ from service.models import Product, Category, db
 from service import app
 from tests.factories import ProductFactory
 
+
+
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
@@ -104,8 +106,6 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
-<<<<<<< HEAD
-=======
     def test_read_a_product(self):
         """It should Read a Product"""
         product = ProductFactory()
@@ -194,4 +194,12 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.category, category)
->>>>>>> dee6d0c (Initial commit)
+from service.models import DataValidationError
+
+def test_update_without_id_raises_error():
+    product = Product(name="TV", category="Electronics", price=999.99)
+    try:
+        product.update()
+        assert False, "DataValidationError was not raised"
+    except DataValidationError as error:
+        assert str(error) == "Update called with empty ID field"
